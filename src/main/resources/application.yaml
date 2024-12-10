@@ -1,0 +1,30 @@
+server:
+  port: 8080 # Specify the server port
+
+spring:
+  application:
+    name: spring-statemachine-demo
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:statemachine} # Replace with your database name
+    username: ${DB_USERNAME:operator}                              # Replace with your username
+    password: ${DB_PASSWORD:}                          # Replace with your password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # Use `update` during development, switch to `validate` or `none` in production
+    show-sql: true     # Enable SQL query logging for debugging
+  state-machine:
+    configuration:
+      enabled: true    # Enable state machine configuration
+
+logging:
+  level:
+    org.springframework.statemachine: DEBUG # Debug logs for state machine events (optional)
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs # Path for OpenAPI JSON documentation
+  swagger-ui:
+    path: /swagger-ui.html # Swagger UI URL
+    operationsSorter: alpha # Sort operations alphabetically
+
