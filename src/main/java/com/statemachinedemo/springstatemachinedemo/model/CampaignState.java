@@ -12,5 +12,5 @@ public enum CampaignState {
     DISTRIBUTING,
     IN_USE_REVIEW,
     IN_USE_APPROVED,
-    FINISH
+    END
 }

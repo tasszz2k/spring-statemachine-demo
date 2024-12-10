@@ -7,10 +7,13 @@ import com.statemachinedemo.springstatemachinedemo.model.CampaignStateLog;
 import com.statemachinedemo.springstatemachinedemo.repository.CampaignRepository;
 import com.statemachinedemo.springstatemachinedemo.repository.CampaignStateLogRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.StateMachineEventResult;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * @author anhdt9
@@ -33,6 +36,7 @@ public class CampaignService {
   public Campaign transitionState(Long campaignId, CampaignEvent event, String changedBy) {
     Campaign campaign = getCampaign(campaignId);
 
+    // Initialize and configure the state machine with the current state
     StateMachine<CampaignState, CampaignEvent> stateMachine =
         stateMachineFactory.getStateMachine(campaignId.toString());
     stateMachine
@@ -43,10 +47,21 @@ public class CampaignService {
                     new DefaultStateMachineContext<>(
                         campaign.getCurrentState(), null, null, null)));
 
-    if (!stateMachine.sendEvent(event)) {
-      throw new IllegalStateException("Invalid state transition");
-    }
+    // Start the state machine reactively
+    stateMachine.startReactively().block();
 
+    // Send the event reactively
+    stateMachine
+        .sendEvent(Mono.just(MessageBuilder.withPayload(event).build()))
+        .doOnNext(
+            result -> {
+              if (!result.getResultType().equals(StateMachineEventResult.ResultType.ACCEPTED)) {
+                throw new IllegalStateException("Invalid state transition");
+              }
+            })
+        .blockLast();
+
+    // Update campaign state and log the transition
     CampaignState previousState = campaign.getCurrentState();
     CampaignState nextState = stateMachine.getState().getId();
 

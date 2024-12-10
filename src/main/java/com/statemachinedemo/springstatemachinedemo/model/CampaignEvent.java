@@ -10,9 +10,10 @@ public enum CampaignEvent {
     FA_APPROVE,
     FA_REJECT,
     MKT_EDIT,
+    DISTRIBUTE,
     PAUSE,
     EDIT_BUDGET,
     APPROVE_BUDGET_CHANGE,
     REJECT_BUDGET_CHANGE,
-    END
+    FINISH
 }
