@@ -11,6 +11,7 @@ public enum CampaignEvent {
     REJECT,
     EDIT,
     DISTRIBUTE,
+    USE,
     TERMINATE,
     END
 }

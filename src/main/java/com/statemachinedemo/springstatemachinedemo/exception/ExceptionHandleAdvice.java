@@ -24,6 +24,7 @@ public class ExceptionHandleAdvice {
     public ResponseEntity<String> handleRuntimeException(
             RuntimeException e, HttpServletRequest request) {
         log.warn("Failed to handle request {}: {}", request.getRequestURI(), e.getMessage());
+        e.printStackTrace();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Failed to handle request: " + e.getMessage());
     }
@@ -32,6 +33,7 @@ public class ExceptionHandleAdvice {
     public ResponseEntity<String> handleIllegalStateException(
             IllegalStateException e, HttpServletRequest request) {
         log.warn("Failed to handle request {}: {}", request.getRequestURI(), e.getMessage());
+        e.printStackTrace();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Failed to handle request: " + e.getMessage());
     }

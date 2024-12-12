@@ -8,6 +8,7 @@ import com.statemachinedemo.springstatemachinedemo.model.Campaign;
 import com.statemachinedemo.springstatemachinedemo.repository.ActionLogRepository;
 import com.statemachinedemo.springstatemachinedemo.repository.CampaignRepository;
 import com.statemachinedemo.springstatemachinedemo.repository.ChangeLogRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
@@ -31,7 +32,6 @@ public class CampaignServiceImpl implements CampaignService {
 
   private final CampaignRepository campaignRepository;
   private final ActionLogRepository actionLogRepository;
-  private final ChangeLogRepository changeLogRepository;
   private final StateMachineFactory<CampaignState, CampaignEvent> stateMachineFactory;
   private final CampaignChangeInterceptor campaignChangeInterceptor;
 
@@ -65,7 +65,19 @@ public class CampaignServiceImpl implements CampaignService {
         .doOnNext(
             result -> {
               if (!result.getResultType().equals(StateMachineEventResult.ResultType.ACCEPTED)) {
-                throw new IllegalStateException("Invalid state transition");
+                List<CampaignEvent> acceptedEvents =
+                    stateMachine.getTransitions().stream()
+                        .filter(
+                            transition ->
+                                transition
+                                    .getSource()
+                                    .getId()
+                                    .equals(stateMachine.getState().getId()))
+                        .map(transition -> transition.getTrigger().getEvent())
+                        .toList();
+                // FIXME: this code is not working as expected
+                throw new IllegalStateException(
+                    "Invalid state transition. Accepted events: " + acceptedEvents);
               }
             })
         .blockLast();
@@ -82,7 +94,7 @@ public class CampaignServiceImpl implements CampaignService {
     log.setPreviousState(previousState);
     log.setNextState(nextState);
     log.setEventTriggered(event);
-    log.setChangedBy(changedBy);
+    log.setActor(changedBy);
     actionLogRepository.save(log);
 
     return campaign;
@@ -140,12 +152,19 @@ public class CampaignServiceImpl implements CampaignService {
   }
 
   @Override
-  public Campaign newCampaign(Campaign campaign) {
+  public Campaign newCampaign(Campaign campaign, String actor) {
     campaign.setCurrentState(CampaignState.DRAFT);
     // save the campaign with the initial state = DRAFT
     var savedCampaign = campaignRepository.save(campaign);
 
     // log action
+    ActionLog log = new ActionLog();
+    log.setCampaign(savedCampaign);
+    log.setPreviousState(null);
+    log.setNextState(CampaignState.DRAFT);
+    log.setEventTriggered(CampaignEvent.CREATE);
+    log.setActor(actor);
+    actionLogRepository.save(log);
 
     return savedCampaign;
   }

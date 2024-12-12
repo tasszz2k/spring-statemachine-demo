@@ -26,8 +26,8 @@ public class CampaignController {
   }
 
   @PostMapping("")
-  public Campaign createCampaign(@RequestBody Campaign campaign) {
-    return campaignService.newCampaign(campaign);
+  public Campaign createCampaign(@RequestBody Campaign campaign, @RequestParam String actor) {
+    return campaignService.newCampaign(campaign, actor);
   }
 
   @PostMapping("/{id}/events/{event}")

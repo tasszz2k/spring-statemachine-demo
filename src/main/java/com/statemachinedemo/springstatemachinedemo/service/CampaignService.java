@@ -13,17 +13,16 @@ import org.springframework.statemachine.StateMachine;
 public interface CampaignService {
   Campaign findById(Long id);
 
-  Campaign transitionState(Long id, CampaignEvent event, String actor);
-
   Campaign transitionState(Long id, CampaignEvent event, CampaignParam param, String actor);
 
   /**
    * Initialize a new campaign: * -> DRAFT
    *
    * @param campaign
+   * @param actor
    * @return
    */
-  Campaign newCampaign(Campaign campaign);
+  Campaign newCampaign(Campaign campaign, String actor);
 
   /**
    * Submit a campaign for FA review: DRAFT -> FA_REVIEW

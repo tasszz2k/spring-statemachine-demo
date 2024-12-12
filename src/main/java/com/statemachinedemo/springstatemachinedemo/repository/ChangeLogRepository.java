@@ -1,11 +1,8 @@
 package com.statemachinedemo.springstatemachinedemo.repository;
 
 import com.statemachinedemo.springstatemachinedemo.model.ChangeLog;
-import com.statemachinedemo.springstatemachinedemo.constant.CampaignState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * @author anhdt9
@@ -13,4 +10,5 @@ import java.util.List;
  */
 @Repository
 public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
+    ChangeLog findFirstByCampaign_CampaignIdOrderByIdDesc(Long campaignId);
 }

@@ -35,7 +35,7 @@ public class ActionLog {
   @Enumerated(EnumType.STRING)
   private CampaignEvent eventTriggered;
 
-  private String changedBy;
+  private String actor;
 
   private String note;
 

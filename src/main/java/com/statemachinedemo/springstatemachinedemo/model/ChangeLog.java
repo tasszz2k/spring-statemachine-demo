@@ -27,6 +27,7 @@ public class ChangeLog {
 
   private String actor;
 
+  // TODO: using Json for params instead
   @Column(columnDefinition = "json")
   private String params;
 
