@@ -1,81 +1,132 @@
 package com.statemachinedemo.springstatemachinedemo.service;
 
-import com.statemachinedemo.springstatemachinedemo.model.Campaign;
 import com.statemachinedemo.springstatemachinedemo.constant.CampaignEvent;
 import com.statemachinedemo.springstatemachinedemo.constant.CampaignState;
-import com.statemachinedemo.springstatemachinedemo.model.ActionLog;
-import com.statemachinedemo.springstatemachinedemo.repository.CampaignRepository;
-import com.statemachinedemo.springstatemachinedemo.repository.ActionLogRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.support.MessageBuilder;
+import com.statemachinedemo.springstatemachinedemo.dto.CampaignParam;
+import com.statemachinedemo.springstatemachinedemo.model.Campaign;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.StateMachineEventResult;
-import org.springframework.statemachine.config.StateMachineFactory;
-import org.springframework.statemachine.support.DefaultStateMachineContext;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 /**
  * @author anhdt9
- * @since 10/12/24
+ * @since 12/12/24
  */
-@Service
-@RequiredArgsConstructor
-public class CampaignService {
+public interface CampaignService {
+  Campaign findById(Long id);
 
-  private final CampaignRepository campaignRepository;
-  private final ActionLogRepository actionLogRepository;
-  private final StateMachineFactory<CampaignState, CampaignEvent> stateMachineFactory;
+  Campaign transitionState(Long id, CampaignEvent event, String actor);
 
-  public Campaign getCampaign(Long id) {
-    return campaignRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Campaign not found"));
-  }
+  Campaign transitionState(Long id, CampaignEvent event, CampaignParam param, String actor);
 
-  public Campaign transitionState(Long campaignId, CampaignEvent event, String changedBy) {
-    Campaign campaign = getCampaign(campaignId);
+  /**
+   * Initialize a new campaign: * -> DRAFT
+   *
+   * @param campaign
+   * @return
+   */
+  Campaign newCampaign(Campaign campaign);
 
-    // Initialize and configure the state machine with the current state
-    StateMachine<CampaignState, CampaignEvent> stateMachine =
-        stateMachineFactory.getStateMachine(campaignId.toString());
-    stateMachine
-        .getStateMachineAccessor()
-        .doWithAllRegions(
-            accessor ->
-                accessor.resetStateMachine(
-                    new DefaultStateMachineContext<>(
-                        campaign.getCurrentState(), null, null, null)));
+  /**
+   * Submit a campaign for FA review: DRAFT -> FA_REVIEW
+   *
+   * @param id
+   * @param actor
+   * @return
+   */
+  StateMachine<CampaignState, CampaignEvent> submitForFAReview(Long id, String actor);
 
-    // Start the state machine reactively
-    stateMachine.startReactively().block();
+  /**
+   * FA rejects a campaign: FA_REVIEW -> REJECTED
+   *
+   * @param id
+   * @param actor
+   * @return
+   */
+  StateMachine<CampaignState, CampaignEvent> reject(Long id, String actor);
 
-    // Send the event reactively
-    stateMachine
-        .sendEvent(Mono.just(MessageBuilder.withPayload(event).build()))
-        .doOnNext(
-            result -> {
-              if (!result.getResultType().equals(StateMachineEventResult.ResultType.ACCEPTED)) {
-                throw new IllegalStateException("Invalid state transition");
-              }
-            })
-        .blockLast();
+  /**
+   * Biz edits a campaign: REJECTED -> DRAFT
+   *
+   * @param id
+   * @param actor
+   * @return
+   */
+  StateMachine<CampaignState, CampaignEvent> approve(Long id, String actor);
 
-    // Update campaign state and log the transition
-    CampaignState previousState = campaign.getCurrentState();
-    CampaignState nextState = stateMachine.getState().getId();
+  /**
+   * Biz edits a campaign: REJECTED -> DRAFT
+   *
+   * @param id
+   * @param param
+   * @param actor
+   * @return
+   */
+  StateMachine<CampaignState, CampaignEvent> edit(
+      Long id, CampaignParam param, String actor);
 
-    campaign.setCurrentState(nextState);
-    campaignRepository.save(campaign);
+  /**
+   * Biz edits a campaign after it has been approved: APPROVED -> FA_REVIEW
+   *
+   * @param id
+   * @param param
+   * @param actor
+   * @return
+   */
+  StateMachine<CampaignState, CampaignEvent> editAfterApproved(
+      Long id, CampaignParam param, String actor);
 
-    ActionLog log = new ActionLog();
-    log.setCampaign(campaign);
-    log.setPreviousState(previousState);
-    log.setNextState(nextState);
-    log.setEventTriggered(event);
-    log.setChangedBy(changedBy);
-    actionLogRepository.save(log);
+  /**
+   * Terminate a campaign: *ANY -> ENDED
+   *
+   * @param id
+   * @param actor
+   * @return
+   */
+  StateMachine<CampaignState, CampaignEvent> terminate(Long id, String actor);
 
-    return campaign;
-  }
+  /**
+   * Distribute a campaign: APPROVED -> DISTRIBUTING
+   *
+   * @param id
+   * @param actor
+   * @return
+   */
+  StateMachine<CampaignState, CampaignEvent> distribute(Long id, String actor);
+
+  /**
+   * Approve a campaign: DISTRIBUTING -> IN_USE_APPROVED
+   *
+   * @param id
+   * @param actor
+   * @return
+   */
+  StateMachine<CampaignState, CampaignEvent> approveForUse(Long id, String actor);
+
+  /**
+   * Reject a campaign: IN_USE_APPROVED -> IN_USE_REVIEW
+   *
+   * @param id
+   * @param actor
+   * @return
+   */
+  StateMachine<CampaignState, CampaignEvent> editBudget(
+      Long id, CampaignParam param, String actor);
+
+  /**
+   * FA rejects a campaign and returns the previous budget approved: IN_USE_REVIEW -> IN_USE_APPROVED
+   *
+   * @param id
+   * @param actor
+   * @return
+   */
+  StateMachine<CampaignState, CampaignEvent> rejectBudget(Long id, String actor);
+
+    /**
+     * FA approves a campaign budget: IN_USE_REVIEW -> IN_USE_APPROVED
+     *
+     * @param id
+     * @param actor
+     * @return
+     */
+  StateMachine<CampaignState, CampaignEvent> approveBudget(Long id, String actor);
+
 }

@@ -12,8 +12,5 @@ public enum CampaignEvent {
     EDIT,
     DISTRIBUTE,
     TERMINATE,
-    EDIT_BUDGET,
-    APPROVE_BUDGET,
-    REJECT_BUDGET,
     END
 }

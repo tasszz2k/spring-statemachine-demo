@@ -5,6 +5,7 @@ import com.statemachinedemo.springstatemachinedemo.constant.CampaignState;
 import java.util.EnumSet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
@@ -19,7 +20,6 @@ import org.springframework.statemachine.state.State;
  */
 @Slf4j
 @Configuration
-// @EnableStateMachine
 @EnableStateMachineFactory
 public class CampaignStateMachineConfig
     extends StateMachineConfigurerAdapter<CampaignState, CampaignEvent> {
@@ -42,6 +42,7 @@ public class CampaignStateMachineConfig
         .source(CampaignState.DRAFT)
         .target(CampaignState.FA_REVIEW)
         .event(CampaignEvent.SUBMIT)
+        .action(actionTest())
         .and()
         .withExternal()
         .source(CampaignState.FA_REVIEW)
@@ -70,33 +71,33 @@ public class CampaignStateMachineConfig
         .and()
         .withExternal()
         .source(CampaignState.APPROVED)
-        .target(CampaignState.DISTRIBUTION)
+        .target(CampaignState.DISTRIBUTING)
         .event(CampaignEvent.DISTRIBUTE)
         .and()
         .withExternal()
-        .source(CampaignState.DISTRIBUTION)
+        .source(CampaignState.DISTRIBUTING)
         .target(CampaignState.IN_USE_REVIEW)
-        .event(CampaignEvent.EDIT_BUDGET)
+        .event(CampaignEvent.EDIT)
         .and()
         .withExternal()
         .source(CampaignState.IN_USE_REVIEW)
         .target(CampaignState.IN_USE_APPROVED)
-        .event(CampaignEvent.APPROVE_BUDGET)
+        .event(CampaignEvent.APPROVE)
         .and()
         .withExternal()
         .source(CampaignState.IN_USE_REVIEW)
         .target(CampaignState.IN_USE_APPROVED)
-        .event(CampaignEvent.REJECT_BUDGET)
+        .event(CampaignEvent.REJECT)
         .and()
         .withExternal()
         .source(CampaignState.IN_USE_REVIEW)
         .target(CampaignState.IN_USE_APPROVED)
-        .event(CampaignEvent.APPROVE_BUDGET)
+        .event(CampaignEvent.APPROVE)
         .and()
         .withExternal()
         .source(CampaignState.IN_USE_REVIEW)
         .target(CampaignState.IN_USE_APPROVED)
-        .event(CampaignEvent.REJECT_BUDGET)
+        .event(CampaignEvent.REJECT)
         .and()
         .withExternal()
         .source(CampaignState.IN_USE_APPROVED)
@@ -116,5 +117,11 @@ public class CampaignStateMachineConfig
           }
         };
     config.withConfiguration().listener(adapter);
+  }
+
+  public Action<CampaignState, CampaignEvent> actionTest() {
+    return context -> {
+      log.info("action -> do something");
+    };
   }
 }
