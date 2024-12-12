@@ -1,4 +1,4 @@
-package com.statemachinedemo.springstatemachinedemo.model;
+package com.statemachinedemo.springstatemachinedemo.constant;
 
 /**
  * @author anhdt9

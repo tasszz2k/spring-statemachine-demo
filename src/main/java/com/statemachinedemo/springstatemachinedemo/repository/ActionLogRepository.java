@@ -1,6 +1,6 @@
 package com.statemachinedemo.springstatemachinedemo.repository;
 
-import com.statemachinedemo.springstatemachinedemo.model.CampaignStateLog;
+import com.statemachinedemo.springstatemachinedemo.model.ActionLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
  * @since 10/12/24
  */
 @Repository
-public interface CampaignStateLogRepository extends JpaRepository<CampaignStateLog, Long> {
+public interface ActionLogRepository extends JpaRepository<ActionLog, Long> {
 }

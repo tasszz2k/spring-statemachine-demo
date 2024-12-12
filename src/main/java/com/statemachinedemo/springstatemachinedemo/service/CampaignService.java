@@ -1,11 +1,11 @@
 package com.statemachinedemo.springstatemachinedemo.service;
 
 import com.statemachinedemo.springstatemachinedemo.model.Campaign;
-import com.statemachinedemo.springstatemachinedemo.model.CampaignEvent;
-import com.statemachinedemo.springstatemachinedemo.model.CampaignState;
-import com.statemachinedemo.springstatemachinedemo.model.CampaignStateLog;
+import com.statemachinedemo.springstatemachinedemo.constant.CampaignEvent;
+import com.statemachinedemo.springstatemachinedemo.constant.CampaignState;
+import com.statemachinedemo.springstatemachinedemo.model.ActionLog;
 import com.statemachinedemo.springstatemachinedemo.repository.CampaignRepository;
-import com.statemachinedemo.springstatemachinedemo.repository.CampaignStateLogRepository;
+import com.statemachinedemo.springstatemachinedemo.repository.ActionLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public class CampaignService {
 
   private final CampaignRepository campaignRepository;
-  private final CampaignStateLogRepository campaignStateLogRepository;
+  private final ActionLogRepository actionLogRepository;
   private final StateMachineFactory<CampaignState, CampaignEvent> stateMachineFactory;
 
   public Campaign getCampaign(Long id) {
@@ -68,13 +68,13 @@ public class CampaignService {
     campaign.setCurrentState(nextState);
     campaignRepository.save(campaign);
 
-    CampaignStateLog log = new CampaignStateLog();
+    ActionLog log = new ActionLog();
     log.setCampaign(campaign);
     log.setPreviousState(previousState);
     log.setNextState(nextState);
     log.setEventTriggered(event);
     log.setChangedBy(changedBy);
-    campaignStateLogRepository.save(log);
+    actionLogRepository.save(log);
 
     return campaign;
   }

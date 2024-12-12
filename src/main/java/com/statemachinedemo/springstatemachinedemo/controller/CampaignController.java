@@ -1,7 +1,7 @@
 package com.statemachinedemo.springstatemachinedemo.controller;
 
 import com.statemachinedemo.springstatemachinedemo.model.Campaign;
-import com.statemachinedemo.springstatemachinedemo.model.CampaignEvent;
+import com.statemachinedemo.springstatemachinedemo.constant.CampaignEvent;
 import com.statemachinedemo.springstatemachinedemo.service.CampaignService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

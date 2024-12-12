@@ -11,7 +11,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update # Use `update` during development, switch to `validate` or `none` in production
+      ddl-auto: none # Use `update` during development, switch to `validate` or `none` in production
     show-sql: true     # Enable SQL query logging for debugging
   state-machine:
     configuration:

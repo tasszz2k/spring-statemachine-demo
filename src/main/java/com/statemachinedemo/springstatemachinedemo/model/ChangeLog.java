@@ -1,9 +1,10 @@
 package com.statemachinedemo.springstatemachinedemo.model;
 
-import com.statemachinedemo.springstatemachinedemo.constant.CampaignState;
 import jakarta.persistence.*;
 import java.util.Date;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,21 +15,26 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Entity(name = "campaigns")
-public class Campaign {
+@Entity(name = "change_logs")
+public class ChangeLog {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long campaignId;
+  private Long id;
 
-  private String campaignName;
-  private String mktCode;
-  private String mktName;
-  private Double budget;
+  @ManyToOne
+  @JoinColumn(name = "campaign_id", nullable = false)
+  private Campaign campaign;
 
-  @Enumerated(EnumType.STRING)
-  private CampaignState currentState;
+  private String actor;
+
+  @Column(columnDefinition = "json")
+  private String params;
+
+  private String state;
 
   @CreationTimestamp private Date createdAt;
 
   @UpdateTimestamp private Date updatedAt;
+
+  // Getters and Setters
 }
