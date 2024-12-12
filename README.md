@@ -1,11 +1,30 @@
 # Spring state machine demo
 
 ## Introduction
-This is a simple demo of Spring state machine. It is a simple state machine that can be used to manage the state of a simple object. 
+- This is a simple demo of Spring state machine. It is a simple state machine that can be used to manage the state of an object.
+- States:
+  + DRAFT
+  + FA_REVIEW
+  + REJECTED
+  + APPROVED
+  + DISTRIBUTING
+  + IN_USE_REVIEW
+  + IN_USE_APPROVED
+  + ENDED
+- Events:
+  + CREATE,
+  + SUBMIT,
+  + APPROVE,
+  + REJECT,
+  + EDIT,
+  + DISTRIBUTE,
+  + USE,
+  + TERMINATE,
+  + END
+  
+  ![campaign-approval.png](docs/campaign-approval.png)
 
-![campaign-approval.png](docs/campaign-approval.png)
-
-![img.png](img.png)
+  ![img.png](img.png)
 ## APIs
 ### 1. Create a new campaign
 ![img.png](docs/img.png)
