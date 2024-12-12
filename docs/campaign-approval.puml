@@ -1,0 +1,29 @@
+@startuml
+'https://plantuml.com/state-diagram
+hide empty description
+
+state "Draft" as draft
+state "FA Review" as fa_review
+state "Rejected" as rejected
+state "Approved" as approved
+state "Distribution" as distribution
+state "In Use" as in_use {
+    state "In Use Review" as in_use_review
+    state "In Use Approved" as in_use_approved
+}
+state "Ended" as ended
+
+[*] -> draft : Create
+draft -> fa_review : Submit
+fa_review --> rejected : Reject
+rejected --> draft : Edit
+fa_review -> approved : Approve
+approved -> fa_review: Edit
+approved -> distribution : Distribute
+approved -> ended: Terminate
+distribution --> in_use_approved : In use
+in_use_approved --> in_use_review : Edit budget
+in_use_review --> in_use_approved: Approve budget
+in_use_review -----> in_use_approved: Reject budget
+in_use_approved -> ended : End
+@enduml

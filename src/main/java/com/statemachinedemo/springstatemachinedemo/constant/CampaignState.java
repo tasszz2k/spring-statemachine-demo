@@ -9,8 +9,8 @@ public enum CampaignState {
     FA_REVIEW,
     REJECTED,
     APPROVED,
-    DISTRIBUTING,
+    DISTRIBUTION,
     IN_USE_REVIEW,
     IN_USE_APPROVED,
-    END
+    ENDED
 }

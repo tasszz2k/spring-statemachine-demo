@@ -6,14 +6,14 @@ package com.statemachinedemo.springstatemachinedemo.constant;
  */
 public enum CampaignEvent {
     CREATE,
-    SUBMIT_FOR_FA_REVIEW,
-    FA_APPROVE,
-    FA_REJECT,
-    MKT_EDIT,
+    SUBMIT,
+    APPROVE,
+    REJECT,
+    EDIT,
     DISTRIBUTE,
-    PAUSE,
+    TERMINATE,
     EDIT_BUDGET,
-    APPROVE_BUDGET_CHANGE,
-    REJECT_BUDGET_CHANGE,
-    FINISH
+    APPROVE_BUDGET,
+    REJECT_BUDGET,
+    END
 }
