@@ -2,6 +2,7 @@ package com.statemachinedemo.springstatemachinedemo.service;
 
 import com.statemachinedemo.springstatemachinedemo.constant.CampaignEvent;
 import com.statemachinedemo.springstatemachinedemo.constant.CampaignState;
+import com.statemachinedemo.springstatemachinedemo.dto.CampaignDto;
 import com.statemachinedemo.springstatemachinedemo.dto.CampaignParam;
 import com.statemachinedemo.springstatemachinedemo.model.ActionLog;
 import com.statemachinedemo.springstatemachinedemo.model.Campaign;
@@ -32,6 +33,7 @@ public class CampaignServiceImpl implements CampaignService {
 
   private final CampaignRepository campaignRepository;
   private final ActionLogRepository actionLogRepository;
+  private final ChangeLogRepository changeLogRepository;
   private final StateMachineFactory<CampaignState, CampaignEvent> stateMachineFactory;
   private final CampaignChangeInterceptor campaignChangeInterceptor;
 
@@ -40,6 +42,18 @@ public class CampaignServiceImpl implements CampaignService {
         .findById(id)
         .orElseThrow(() -> new RuntimeException("Campaign not found with id: " + id));
   }
+
+  @Override
+  public CampaignDto findCampaignWithChanges(Long id) {
+    var campaign = findById(id);
+    var changeLog = changeLogRepository.findFirstByCampaign_CampaignIdOrderByIdDesc(id);
+    if (changeLog == null) {
+      return new CampaignDto(campaign, null);
+    }
+    var campaignParam = CampaignParam.fromJson(changeLog.getParams());
+    return new CampaignDto(campaign, campaignParam);
+  }
+
   @Override
   public Campaign transitionState(Long id, CampaignEvent event, CampaignParam param, String actor) {
     sendEvent(id, event, actor, param);

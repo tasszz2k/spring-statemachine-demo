@@ -2,6 +2,7 @@ package com.statemachinedemo.springstatemachinedemo.service;
 
 import com.statemachinedemo.springstatemachinedemo.constant.CampaignEvent;
 import com.statemachinedemo.springstatemachinedemo.constant.CampaignState;
+import com.statemachinedemo.springstatemachinedemo.dto.CampaignDto;
 import com.statemachinedemo.springstatemachinedemo.dto.CampaignParam;
 import com.statemachinedemo.springstatemachinedemo.model.Campaign;
 import org.springframework.statemachine.StateMachine;
@@ -12,6 +13,8 @@ import org.springframework.statemachine.StateMachine;
  */
 public interface CampaignService {
   Campaign findById(Long id);
+
+  CampaignDto findCampaignWithChanges(Long id);
 
   Campaign transitionState(Long id, CampaignEvent event, CampaignParam param, String actor);
 

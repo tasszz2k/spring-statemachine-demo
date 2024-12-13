@@ -1,6 +1,7 @@
 package com.statemachinedemo.springstatemachinedemo.controller;
 
 import com.statemachinedemo.springstatemachinedemo.constant.CampaignEvent;
+import com.statemachinedemo.springstatemachinedemo.dto.CampaignDto;
 import com.statemachinedemo.springstatemachinedemo.dto.CampaignParam;
 import com.statemachinedemo.springstatemachinedemo.model.Campaign;
 import com.statemachinedemo.springstatemachinedemo.service.CampaignServiceImpl;
@@ -21,8 +22,8 @@ public class CampaignController {
   private final CampaignServiceImpl campaignService;
 
   @GetMapping("/{id}")
-  public Campaign getCampaign(@PathVariable Long id) {
-    return campaignService.findById(id);
+  public CampaignDto getCampaign(@PathVariable Long id) {
+    return campaignService.findCampaignWithChanges(id);
   }
 
   @PostMapping("")
